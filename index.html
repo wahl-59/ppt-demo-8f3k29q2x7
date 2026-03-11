@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<meta name="robots" content="noindex, nofollow">
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OCAP Forecast Product Eligibility – Decision Placemat</title>
+  <title>OCAP Forecast Product Eligibility & Status Assignment – Decision Placemat</title>
   <style>
     :root{
       --primary:#1a2c4e;
@@ -12,6 +11,12 @@
 
       --pass:#276749;
       --pass-bg:#f0fff4;
+
+      --supp:#2b6cb0;
+      --supp-bg:#ebf8ff;
+
+      --monitor:#6b46c1;
+      --monitor-bg:#f5f3ff;
 
       --fail:#9b2c2c;
       --fail-bg:#fff5f5;
@@ -58,17 +63,15 @@
     .subtitle{ font-size:13px; color:var(--secondary); font-weight:700; margin-top:6px; }
     .meta{ text-align:right; font-size:11px; color:var(--muted); line-height:1.35; }
 
-    /* Layout */
     .flow{
       display:grid;
-      grid-template-columns: 1fr 1fr 1fr 0.95fr; /* 3 gates + outcome */
+      grid-template-columns: 1fr 1fr 1fr 0.95fr;
       gap:14px;
       align-items:stretch;
       margin-bottom:14px;
       min-height: 420px;
     }
 
-    /* Cards */
     .gate, .outcome{
       background:var(--paper);
       border:1px solid var(--border);
@@ -110,14 +113,12 @@
     .gate-body{ padding:12px; display:flex; flex-direction:column; gap:10px; height:100%; }
     .desc{ font-size:12px; color:#4a5568; line-height:1.35; font-style:italic; }
 
-    /* Progressive gating */
     .disabled{
       opacity:.45;
       filter: grayscale(0.2);
       pointer-events:none;
     }
 
-    /* Checklist */
     .checklist{ display:flex; flex-direction:column; gap:10px; }
     .check-item{
       display:flex;
@@ -170,7 +171,6 @@
       line-height:1.35;
     }
 
-    /* Tooltips */
     .has-tip{ position:relative; }
     .help-icon{
       display:inline-flex;
@@ -214,7 +214,6 @@
     .tip li{ margin:4px 0; }
     .has-tip:hover .tip, .has-tip:focus-within .tip{ display:block; }
 
-    /* Stop boxes inside gates */
     .stop{
       margin-top:auto;
       border-top:1px dashed var(--border);
@@ -237,8 +236,9 @@
     .stop .box.fail h4{ color:var(--fail); }
     .stop .box.diag{ border-color:#fbd38d; background:var(--diag-bg); }
     .stop .box.diag h4{ color:#975a16; }
+    .stop .box.monitor{ border-color:#d6bcfa; background:var(--monitor-bg); }
+    .stop .box.monitor h4{ color:var(--monitor); }
 
-    /* Outcome */
     .outcome-header{
       background:var(--primary);
       color:#fff;
@@ -265,9 +265,11 @@
       text-transform:none;
     }
     .dot{ width:10px; height:10px; border-radius:999px; background:#ffd166; }
-    .dot.pass{ background: #39d98a; }
-    .dot.fail{ background: #ff5c7a; }
-    .dot.diag{ background: #f6ad55; }
+    .dot.pass{ background:#39d98a; }
+    .dot.fail{ background:#ff5c7a; }
+    .dot.diag{ background:#f6ad55; }
+    .dot.monitor{ background:#9f7aea; }
+    .dot.supp{ background:#4299e1; }
 
     .outcome-body{
       padding:12px;
@@ -289,6 +291,8 @@
       gap:8px;
     }
     .card.pass{ background:var(--pass-bg); border-color:var(--pass); color:var(--pass); }
+    .card.supp{ background:var(--supp-bg); border-color:var(--supp); color:var(--supp); }
+    .card.monitor{ background:var(--monitor-bg); border-color:var(--monitor); color:var(--monitor); }
     .card.fail{ background:var(--fail-bg); border-color:var(--fail); color:var(--fail); }
     .card.diag{ background:var(--diag-bg); border-color:var(--diag); color:#975a16; }
     .card.neutral{
@@ -301,8 +305,10 @@
 
     .card strong{ font-size:14px; }
     .card .big{ font-size:34px; margin-bottom:2px; }
-    .card .sub{ font-size:11px; color:#2d3748; max-width: 95%; line-height:1.35; }
+    .card .sub{ font-size:11px; color:#2d3748; max-width:95%; line-height:1.35; }
     .card.pass .sub{ color:#1f3a2b; }
+    .card.supp .sub{ color:#1e3a5f; }
+    .card.monitor .sub{ color:#44337a; }
     .card.fail .sub{ color:#4a1f1f; }
     .card.diag .sub{ color:#5a3a13; }
 
@@ -316,7 +322,6 @@
     }
     .why ul{ margin:6px 0 0; padding-left:18px; }
 
-    /* Evidence drawer */
     .drawer{
       border:1px solid var(--border);
       border-radius:8px;
@@ -348,7 +353,6 @@
     }
     .btn:hover{ background: rgba(0,0,0,.03); }
 
-    /* Footer */
     .reg{
       border-top:2px solid var(--border);
       padding-top:14px;
@@ -377,8 +381,8 @@
 <body>
   <header>
     <div>
-      <h1>OCAP Forecast Product Eligibility</h1>
-      <div class="subtitle">Truckee & Carson River Basins • Forecast Relevance (Definition → Appropriateness → Skill)</div>
+      <h1>OCAP Forecast Product Eligibility & Status Assignment</h1>
+      <div class="subtitle">Truckee & Carson River Basins • Forecast Relevance (Definition → Eligibility → Comparative Preference)</div>
     </div>
     <div class="meta">
       <strong>Interactive Placemat</strong><br/>
@@ -457,19 +461,20 @@
     </section>
 
     <!-- Gate 2 -->
-    <section class="gate disabled" id="gate2" aria-label="Gate 2 Operational Appropriateness">
+    <section class="gate disabled" id="gate2" aria-label="Gate 2 Operational Eligibility">
       <div class="gate-header">
         <span class="has-tip" style="display:flex;align-items:center;gap:8px;">
-          2. Operational (Appropriateness)
+          2. Operational Eligibility
           <span class="help-icon" tabindex="0">i</span>
           <div class="tip">
-            <b>What this gate decides:</b> Even if it is a forecast, can it be used for OCAP operations?<br/><br/>
+            <b>What this gate decides:</b> Even if it is a forecast, is it operationally eligible for OCAP consideration?<br/><br/>
             <b>What to ask for:</b>
             <ul>
               <li>Can it be turned into an OCAP input <b>without expert judgment</b>?</li>
               <li>Does it cover a horizon relevant to storage targets?</li>
               <li>Is it produced by an operational steward with continuity?</li>
               <li>Is the method documented so it can be audited?</li>
+              <li>Does a hindcast/reforecast record exist so performance can actually be evaluated?</li>
             </ul>
           </div>
         </span>
@@ -477,7 +482,7 @@
       </div>
 
       <div class="gate-body">
-        <div class="desc">A forecast can be “accurate” yet still unusable for OCAP. This gate screens practicality, continuity, and auditability.</div>
+        <div class="desc">This gate determines whether the forecast can enter the pool of products considered for OCAP use. It screens practicality, continuity, and auditability.</div>
 
         <div class="checklist">
           <label class="check-item">
@@ -508,11 +513,12 @@
           <label class="check-item">
             <input type="checkbox" class="gate-check" data-gate="2" />
             <span class="label has-tip">
-              <b>Operational stability</b> (not a research pilot)
+              <b>Operational stability, continuity & longevity</b> (not a research pilot)
               <small>Produced on a schedule by an entity with an operational mission.</small>
               <span class="help-icon dark" tabindex="0">i</span>
               <div class="tip">
-                <b>I.e.,</b> “Who runs it? Is it expected to exist in 10 years?”<br/><br/>
+                <b>I.e.,</b> “Who runs it? Is it expected to exist in 10 years?”<br/>
+                Indicators include institutional mandate, agency ownership, operational funding, and established production schedule.<br/><br/>
                 <b>Red flag:</b> Grant-funded experiments with no operational mandate.
               </div>
             </span>
@@ -542,53 +548,61 @@
               </div>
             </span>
           </label>
+
+          <label class="check-item">
+            <input type="checkbox" class="gate-check" data-gate="2" />
+            <span class="label has-tip">
+              <b>Hindcast / reforecast availability</b>
+              <small>Sufficient historical record exists to evaluate forecast skill.</small>
+              <span class="help-icon dark" tabindex="0">i</span>
+              <div class="tip">
+                <b>Meaning:</b> A hindcast or reforecast dataset exists that allows objective evaluation of forecast performance.<br/><br/>
+                <b>I.e.,</b> “Is there a historical reconstruction of forecasts issued using only data available at the time?”<br/><br/>
+                Hindcast length should be sufficient to evaluate performance across a representative range of hydrologic conditions (wet, normal, and dry periods).<br/><br/>
+                <b>Red flag:</b> A forecast with no hindcast record or only a very short experimental evaluation period.
+              </div>
+            </span>
+          </label>
         </div>
 
         <div class="stop">
           <div class="box fail">
             <h4>Stop if any unchecked</h4>
-            <p>If any item above is unchecked, the forecast is <b>operationally unsuitable</b> for setting OCAP targets (even if useful for situational awareness).</p>
+            <p>If any item above is unchecked, the forecast is <b>operationally ineligible</b> for OCAP target setting, even if it may still be useful for research or situational awareness.</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Gate 3 -->
-    <section class="gate disabled" id="gate3" aria-label="Gate 3 Skill">
+    <section class="gate disabled" id="gate3" aria-label="Gate 3 Comparative Preference">
       <div class="gate-header">
         <span class="has-tip" style="display:flex;align-items:center;gap:8px;">
-          3. Skill (Evidence)
+          3. Skill / Comparative Preference
           <span class="help-icon" tabindex="0">i</span>
           <div class="tip">
-            <b>What this gate decides:</b> Is there objective evidence the forecast works for the basin and time horizon required by OCAP?<br/><br/>
+            <b>What this gate decides:</b> Among operationally eligible forecasts, how much value does this source add for the basin and decision horizon required by OCAP?<br/><br/>
             <b>What to ask for:</b>
             <ul>
               <li>Hindcast/verification report for Truckee/Carson</li>
-              <li>Metrics (bias, RMSE/MAE, CRPS for ensembles)</li>
+              <li>Metrics using accepted forecast verification methods (e.g., bias, RMSE/MAE, CRPS or other probabilistic scores for ensembles)</li>
               <li>Comparison to baseline (climatology + persistence)</li>
               <li>Evidence for the <b>same horizon</b> used for OCAP targets</li>
+              <li>Evidence that the source adds information for uncertainty or important hydrologic regimes</li>
             </ul>
+            Forecast verification should follow well-established methods in the forecast verification literature to ensure the framework remains defensible and durable over time.
           </div>
         </span>
         <span id="g3icon">○</span>
       </div>
 
       <div class="gate-body">
-        <div class="desc">A forecast may only be considered if evidence shows it adds predictive value beyond baselines.</div>
+        <div class="desc">
+		A forecast may only be considered if evidence demonstrates predictive value beyond baseline methods (e.g., climatology + persistence), 
+		or contributes useful information for representing forecast uncertainty or hydrologic regime behavior.
+        </div>
 
         <div class="checklist">
-          <label class="check-item">
-            <input type="checkbox" class="gate-check" data-gate="3" />
-            <span class="label has-tip">
-              <b>Hindcasts</b> using only data available at the time
-              <small>Prevents inflated “after-the-fact” performance claims.</small>
-              <span class="help-icon dark" tabindex="0">i</span>
-              <div class="tip">
-                <b>I.e.,</b> “Confirm hindcasts did not use future observations unavailable at issuance.”
-              </div>
-            </span>
-          </label>
-
           <label class="check-item">
             <input type="checkbox" class="gate-check" data-gate="3" />
             <span class="label has-tip">
@@ -620,28 +634,37 @@
               <small>Bias/error stats; probabilistic scores for ensembles.</small>
               <span class="help-icon dark" tabindex="0">i</span>
               <div class="tip">
-                <b>I.e.,</b> “Provide bias and error metrics (and CRPS if an ensemble) with evaluation period.”
+                <b>I.e.,</b> “Provide bias and error metrics (and probabilistic verification metrics such as CRPS for ensembles) with the evaluation period clearly defined.”<br/><br/>
+                Forecast verification should use established methods from the forecast verification literature appropriate to deterministic or ensemble forecasts.
               </div>
             </span>
           </label>
 
-          <label class="check-item">
-            <input type="checkbox" class="gate-check" data-gate="3" />
-            <span class="label has-tip">
-              Beats baseline (climatology + persistence)
-              <small>Must add value beyond “average year” or persistence.</small>
-              <span class="help-icon dark" tabindex="0">i</span>
-              <div class="tip">
-                <b>I.e.,</b> “Show comparison vs climatology and persistence benchmarks.”
-              </div>
-            </span>
-          </label>
+			<label class="check-item">
+			  <input type="checkbox" class="gate-check" data-gate="3" />
+			  <span class="label has-tip">
+				<b>Shows added predictive value beyond simple baselines</b>
+				<small>Multi-attribute assessment shows demonstrable value in one or more forecast-verification categories.
+				<ul>
+					<li>Accuracy: Closeness to observations.</li>
+					<li>Bias: Systematic over- or under-prediction.</li>
+					<li>Reliability: Consistency between predicted probabilities and observed frequencies (e.g., does a “10% flood risk” occur about 10% of the time?).</li>
+					<li>Resolution: Ability of the model to distinguish between different outcomes.</li>
+					<li>Sharpness: The concentration or confidence of the forecast distribution.</li>
+				  </ul></small>
+
+				<span class="help-icon dark" tabindex="0">i</span>
+				<div class="tip">
+				  <b>I.e.,</b> “Show how the forecast adds value beyond simple baselines using accepted verification attributes, based on a multi-attribute assessment of forecast performance.”
+				</div>
+			  </span>
+			</label>		  
         </div>
 
         <div class="stop">
-          <div class="box fail">
-            <h4>Stop if any unchecked</h4>
-            <p>If any item above is unchecked, there is insufficient evidence of skill for OCAP target setting. The forecast <b>shall not be used</b> for targets until evidence exists.</p>
+          <div class="box monitor">
+            <h4>Status if not fully checked</h4>
+            <p>If Gate 3 is incomplete, the forecast may still remain <b>eligible</b>, but its role should generally be limited to <b>monitoring / parallel testing</b> or, where justified, <b>supplemental use</b> until stronger comparative evidence exists.</p>
           </div>
         </div>
       </div>
@@ -650,7 +673,7 @@
     <!-- Outcome -->
     <aside class="outcome" aria-label="Outcome">
       <div class="outcome-header">
-        <span>Outcome</span>
+        <span>Status Assignment</span>
         <span class="status-pill">
           <span class="dot" id="pillDot"></span>
           <span id="pillText">Needs info</span>
@@ -677,21 +700,36 @@
           </div>
         </div>
 
-        <div class="card fail" id="cardFail">
+        <div class="card fail" id="cardIneligible">
           <div class="big">🛑</div>
-          <strong>EXCLUDED</strong>
-          <div class="sub" id="failSub">Fails one or more OCAP gates for operational use.</div>
-          <div class="why" id="failWhy"></div>
+          <strong>OPERATIONALLY INELIGIBLE</strong>
+          <div class="sub" id="ineligibleSub">Forecast exists, but it is not operationally eligible for OCAP target setting.</div>
+          <div class="why" id="ineligibleWhy"></div>
         </div>
 
-        <div class="card pass" id="cardPass">
+        <div class="card monitor" id="cardMonitor">
+          <div class="big">🟪</div>
+          <strong>ELIGIBLE FOR MONITORING / PARALLEL TESTING</strong>
+          <div class="sub" id="monitorSub">Forecast meets definition and operational eligibility, but comparative performance evidence is still incomplete or too limited for operational reliance.</div>
+          <div class="why" id="monitorWhy"></div>
+        </div>
+
+        <div class="card supp" id="cardSupplemental">
+          <div class="big">🟦</div>
+          <strong>ELIGIBLE FOR SUPPLEMENTAL USE</strong>
+          <div class="sub" id="suppSub">Forecast is operationally eligible and shows some comparative value, but current evidence supports use alongside other approved sources rather than as the sole operational basis.</div>
+          <div class="why" id="suppWhy"></div>
+        </div>
+
+        <div class="card pass" id="cardPrimary">
           <div class="big">✅</div>
-          <strong>QUALIFIED OPERATIONAL FORECAST</strong>
-          <div class="sub">Meets definition, is operationally appropriate, and has demonstrated skill evidence. May be considered for OCAP administration (subject to predefined application rules).</div>
+          <strong>ELIGIBLE FOR PRIMARY OR WEIGHTED OPERATIONAL USE</strong>
+          <div class="sub">Meets definition, is operationally eligible, and has comparative evidence sufficient to support primary use or inclusion in a predefined weighted multi-forecast approach.</div>
           <div class="why">
             <b>Administrative safeguard:</b>
             <ul>
               <li>If multiple forecasts are used, define the combination/prioritization method in advance to prevent forecast-shopping.</li>
+              <li>Status assignment should be tied to the intended OCAP use case and documented review procedures.</li>
             </ul>
           </div>
         </div>
@@ -709,6 +747,7 @@
               <li><b>Verification report</b> with metrics and baselines</li>
               <li><b>Operational continuity</b> statement (steward, mandate)</li>
               <li><b>Integration pathway</b> into existing OCAP/TROA workflows</li>
+              <li><b>Status rationale</b> explaining whether the source is monitoring-only, supplemental, or primary/weighted</li>
             </ul>
             <div style="margin-top:10px;">
               <button class="btn" id="btnCopy">Copy checklist</button>
@@ -724,26 +763,27 @@
     <div>
       <h3>Definition</h3>
       <p><b>Operational Forecast</b>: A quantitative prediction of future streamflow or reservoir inflow, expressed as a time series or volumetric quantity over a defined forecast horizon, suitable for direct use in setting storage objectives and related operational calculations.</p>
-      <p><b>Observational/Diagnostic Products</b>: Describe existing/antecedent conditions (e.g., SWE, soil moisture). These may inform eligible forecasts but shall not directly set OCAP targets unless they independently meet the forecast definition.</p>
+      <p><b>Observational/Diagnostic Products</b>: Describe existing/antecedent conditions (e.g., SWE, soil moisture, antecedent precipitation, etc.). These are typically inputs that inform eligible forecasts, but are not forecasts themselves and shall not directly set OCAP targets unless they independently meet the forecast definition.</p>
     </div>
     <div>
-      <h3>Appropriateness</h3>
+      <h3>Operational Eligibility</h3>
       <ul>
         <li><b>Direct output</b> usable without discretionary interpretation</li>
         <li><b>OCAP-relevant horizon</b> for storage/diversion decisions</li>
         <li><b>Operational stability</b> and continuity (not experimental)</li>
         <li><b>Transparency</b> sufficient for independent audit</li>
         <li><b>Integration pathway</b> within existing OCAP/TROA frameworks</li>
+        <li><b>Hindcasts</b> using only data available at issuance</li>
       </ul>
     </div>
     <div>
-      <h3>Skill</h3>
+      <h3>Comparative Preference</h3>
       <ul>
-        <li><b>Hindcasts</b> using only data available at issuance</li>
         <li><b>Basin-specific</b> evaluation for Truckee/Carson</li>
         <li><b>Horizon-matched</b> skill for OCAP decision horizon</li>
         <li><b>Metrics</b> (bias/error and probabilistic where applicable)</li>
-        <li><b>Baseline comparison</b> beats climatology + persistence</li>
+        <li><b>Baseline comparison</b> against climatology + persistence</li>
+        <li><b>Status assignment</b> based on evidence for monitoring, supplemental, or primary/weighted use</li>
       </ul>
     </div>
   </section>
@@ -766,10 +806,17 @@
 
       const cardNeutral = $('#cardNeutral');
       const cardDiag = $('#cardDiag');
-      const cardFail = $('#cardFail');
-      const cardPass = $('#cardPass');
-      const failSub = $('#failSub');
-      const failWhy = $('#failWhy');
+      const cardIneligible = $('#cardIneligible');
+      const cardMonitor = $('#cardMonitor');
+      const cardSupplemental = $('#cardSupplemental');
+      const cardPrimary = $('#cardPrimary');
+
+      const ineligibleSub = $('#ineligibleSub');
+      const ineligibleWhy = $('#ineligibleWhy');
+      const monitorSub = $('#monitorSub');
+      const monitorWhy = $('#monitorWhy');
+      const suppSub = $('#suppSub');
+      const suppWhy = $('#suppWhy');
 
       const drawer = $('#drawer');
       const drawerToggle = $('#drawerToggle');
@@ -782,7 +829,7 @@
       const checks3 = $$('input.gate-check[data-gate="3"]');
 
       function allChecked(list){ return list.every(c => c.checked); }
-      function anyUnchecked(list){ return list.some(c => !c.checked); }
+      function countChecked(list){ return list.filter(c => c.checked).length; }
 
       function setGateStatus(gateEl, iconEl, pass){
         gateEl.classList.toggle('passed', pass);
@@ -790,15 +837,17 @@
       }
 
       function showCard(which){
-        [cardNeutral, cardDiag, cardFail, cardPass].forEach(c => c.style.display = 'none');
+        [cardNeutral, cardDiag, cardIneligible, cardMonitor, cardSupplemental, cardPrimary].forEach(c => c.style.display = 'none');
         which.style.display = 'flex';
       }
 
       function setPill(mode, text){
-        pillDot.classList.remove('pass','fail','diag');
+        pillDot.classList.remove('pass','fail','diag','monitor','supp');
         if(mode === 'pass') pillDot.classList.add('pass');
         if(mode === 'fail') pillDot.classList.add('fail');
         if(mode === 'diag') pillDot.classList.add('diag');
+        if(mode === 'monitor') pillDot.classList.add('monitor');
+        if(mode === 'supp') pillDot.classList.add('supp');
         pillText.textContent = text;
       }
 
@@ -808,7 +857,6 @@
       }
 
       function listUnmet(list){
-        // Pull only the first line of the label
         const out = [];
         list.forEach(cb => {
           if(!cb.checked){
@@ -825,19 +873,21 @@
         const g2Pass = allChecked(checks2);
         const g3Pass = allChecked(checks3);
 
-        setGateStatus(gate1, g1icon, g1Pass);
+        const g3Count = countChecked(checks3);
 
-        // Progressive gating
+        const basinSpecific = checks3[0].checked;
+        const horizonMatch = checks3[1].checked;
+        const metricsReported = checks3[2].checked;
+        const beatsBaseline = checks3[3].checked;
+
+        setGateStatus(gate1, g1icon, g1Pass);
         unlockGate(gate2, g1Pass);
         unlockGate(gate3, g1Pass && g2Pass);
-
-        // Gate icons (reflect actual pass, but gates might be disabled)
         setGateStatus(gate2, g2icon, g2Pass);
         setGateStatus(gate3, g3icon, g3Pass);
 
         const any = [...checks1, ...checks2, ...checks3].some(c => c.checked);
 
-        // Outcome logic
         if(!any){
           showCard(cardNeutral);
           setPill('diag', 'Needs Gate 1');
@@ -846,30 +896,47 @@
 
         if(!g1Pass){
           showCard(cardDiag);
-          setPill('diag', 'Complete (diagnostic)');
+          setPill('diag', 'Diagnostic / observational');
           return;
         }
 
         if(!g2Pass){
-          showCard(cardFail);
-          setPill('fail', 'Complete (excluded)');
-          failSub.textContent = 'Forecast exists, but it is not operationally appropriate for OCAP target setting.';
+          showCard(cardIneligible);
+          setPill('fail', 'Operationally ineligible');
+          ineligibleSub.textContent = 'Forecast exists, but it does not yet meet the operational eligibility requirements needed for OCAP target setting.';
           const unmet = listUnmet(checks2);
-          failWhy.innerHTML = '<b>What failed:</b><ul>' + unmet.map(x => '<li>'+x+'</li>').join('') + '</ul>';
+          ineligibleWhy.innerHTML = '<b>What is still missing:</b><ul>' + unmet.map(x => '<li>'+x+'</li>').join('') + '</ul>';
           return;
         }
 
-        if(!g3Pass){
-          showCard(cardFail);
-          setPill('fail', 'Complete (excluded)');
-          failSub.textContent = 'Forecast is implementable, but lacks sufficient evidence of predictive skill for OCAP decisions.';
-          const unmet = listUnmet(checks3);
-          failWhy.innerHTML = '<b>What failed:</b><ul>' + unmet.map(x => '<li>'+x+'</li>').join('') + '</ul>';
+        if(g3Pass){
+          showCard(cardPrimary);
+          setPill('pass', 'Primary / weighted use');
           return;
         }
 
-        showCard(cardPass);
-        setPill('pass', 'Complete (qualified)');
+        if(g3Count === 0){
+          showCard(cardMonitor);
+          setPill('monitor', 'Monitoring / parallel testing');
+          monitorSub.textContent = 'Forecast is operationally eligible, but no comparative skill evidence has been entered yet. Keep it in monitoring or parallel testing status until comparative evidence is documented.';
+          monitorWhy.innerHTML = '<b>What to add next:</b><ul><li>Basin-specific verification results</li><li>Horizon-matched skill evidence</li><li>Reported metrics</li><li>Baseline comparison</li></ul>';
+          return;
+        }
+
+        if((basinSpecific && metricsReported) || (horizonMatch && metricsReported) || (g3Count >= 3 && !beatsBaseline)){
+          showCard(cardSupplemental);
+          setPill('supp', 'Supplemental use');
+          let unmet = listUnmet(checks3);
+          suppSub.textContent = 'Forecast is operationally eligible and shows some comparative value, but the evidence currently supports supplemental use rather than sole or primary operational reliance.';
+          suppWhy.innerHTML = '<b>What still limits stronger status:</b><ul>' + unmet.map(x => '<li>'+x+'</li>').join('') + '</ul><ul><li>Use alongside approved forecasts or within a predefined weighting scheme.</li></ul>';
+          return;
+        }
+
+        showCard(cardMonitor);
+        setPill('monitor', 'Monitoring / parallel testing');
+        const unmet = listUnmet(checks3);
+        monitorSub.textContent = 'Forecast is operationally eligible, but comparative evidence is still too limited or incomplete to justify operational reliance beyond monitoring or parallel testing.';
+        monitorWhy.innerHTML = '<b>What is still missing:</b><ul>' + unmet.map(x => '<li>'+x+'</li>').join('') + '</ul>';
       }
 
       function toggleDrawer(){
@@ -891,7 +958,8 @@
           '- Hindcast methodology confirming “data available at the time”',
           '- Verification report with metrics and baselines',
           '- Operational continuity statement (steward, mandate)',
-          '- Integration pathway into existing OCAP/TROA workflows'
+          '- Integration pathway into existing OCAP/TROA workflows',
+          '- Status rationale for monitoring, supplemental, or primary/weighted use'
         ].join('\n');
 
         try{
@@ -910,7 +978,6 @@
 
       [...checks1, ...checks2, ...checks3].forEach(cb => cb.addEventListener('change', update));
 
-      // Init
       unlockGate(gate2, false);
       unlockGate(gate3, false);
       update();
